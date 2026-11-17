@@ -23,3 +23,11 @@ This is a prototype, not the specification's completed P0 release. Data persists
 5. Run Gate B, rules tests, full offline reload and complete end-to-end scenario on the target workstation.
 
 Build/typecheck passed. Browser QA could not run because the managed browser sandbox failed to initialize.
+
+## UI redesign and Impeccable
+
+Installed project-local Codex skill with `npx impeccable install --providers=codex --scope=project`. Skill lives in `.agents/skills/impeccable/`; hook configuration is in `.codex/hooks.json`. Codex may require a reload and hook approval to activate automatic checks in future sessions; this session read the skill and ran its detector directly.
+
+The user selected the workshop catalogue direction, captured in PRODUCT.md, DESIGN.md and .impeccable/design.json. Replaced the marketing hero and small typography with a task-first catalogue, paired reference and step sequence, dark navigation and warm orange actions. Includes keyboard dialog focus containment and Escape handling.
+
+Verification: strict TypeScript and production build pass. Impeccable source scan produced no findings (regex-only, not a rendered accessibility audit). Independent Impeccable finish review returned `recapture`: managed browser initialization and preview relay failed, so desktop/mobile captures and visual approval remain outstanding.

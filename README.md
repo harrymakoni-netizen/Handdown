@@ -56,3 +56,21 @@ For Google Cloud Shell, clone `https://github.com/harrymakoni-netizen/Handdown.g
 App Check now initializes before Firebase service clients using `ReCaptchaEnterpriseProvider` and the public Handdown Web site key, with automatic token refresh enabled. The key must remain registered against the same Firebase web app. Its authorized domain is `fbailogic26vrt-3048.web.app`; other hosting origins require explicit domain registration before they can obtain valid attestation.
 
 Console registration and a successful build do not prove token attestation works. After deploying, verify real requests and App Check metrics before enabling additional service enforcement. Local development requires a separately registered debug provider; no debug tokens or automatic debug bypass are included. Authentication, Firestore persistence, Storage uploads and AI features are still pending implementation.
+
+## Sign-in and workspace membership
+
+Email/password sign-in, password reset and sign-out now use Firebase Authentication. Only the provisioned owner UID can bootstrap the `training` workspace. Firestore membership documents determine account roles; changing browser state does not grant membership write permissions. The owner can add existing Authentication UIDs through the account profile. There is no public signup or client-selected privilege.
+
+Deploy the membership rules **with** the UI update, from the assigned account's Cloud Shell:
+
+```sh
+git pull --ff-only
+npm ci
+npm run deploy:firebase
+```
+
+The owner signs in with the account for the UID supplied during setup. The first successful login creates the workspace and its owner membership via a transaction governed by Firestore rules. A non-member sees an access-request screen with their UID, not the workspace. Access errors retain retry, sign-out and App Check diagnostic actions. Live attestation can be tested using Device readiness → Verify App Check; tokens are never displayed or logged.
+
+Roles protect workspace membership in Firestore. Shared lesson publication, review decisions, uploads and synchronisation remain unimplemented and denied by rules. Local drafts, session progress and review annotations remain in browser storage, now namespaced by signed-in UID. This separates app views on a shared browser but is not encryption; someone with browser storage access can read those records. Previous unscoped preview records are retained in browser storage but are not automatically imported into another identity.
+
+Run `npm run test:rules` for the isolated Firestore emulator authorization suite; it uses a `demo-` project and never writes to the sprint database. User passwords and authentication tokens must never be placed in this repository.

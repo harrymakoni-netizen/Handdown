@@ -6,7 +6,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
-    "deploy:hosting": "firebase deploy --only hosting --project fbailogic26vrt-3048"
+    "deploy:hosting": "firebase deploy --only hosting --project fbailogic26vrt-3048",
+    "deploy:firebase": "firebase deploy --only firestore:rules,hosting --project fbailogic26vrt-3048",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-handdown \"node --test tests/firestore.rules.test.mjs\""
   },
   "dependencies": {
     "firebase": "13.4.0",
@@ -15,6 +17,7 @@
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "firebase-tools": "15.37.0",

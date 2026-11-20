@@ -50,3 +50,9 @@ npm run deploy:hosting
 `firebase.json` builds the app before deployment and serves `dist`, with SPA routing and immutable hashed asset caching. `.firebaserc` and the deployment script explicitly target the sprint project. Do not deploy database or Storage rules until they are implemented and tested.
 
 For Google Cloud Shell, clone `https://github.com/harrymakoni-netizen/Handdown.git`, enter the checkout, then run the commands above. If browser callback login is unavailable, use `npx firebase login --no-localhost` and complete authorization privately in that shell. Do not share authentication codes or tokens in chat.
+
+### App Check
+
+App Check now initializes before Firebase service clients using `ReCaptchaEnterpriseProvider` and the public Handdown Web site key, with automatic token refresh enabled. The key must remain registered against the same Firebase web app. Its authorized domain is `fbailogic26vrt-3048.web.app`; other hosting origins require explicit domain registration before they can obtain valid attestation.
+
+Console registration and a successful build do not prove token attestation works. After deploying, verify real requests and App Check metrics before enabling additional service enforcement. Local development requires a separately registered debug provider; no debug tokens or automatic debug bypass are included. Authentication, Firestore persistence, Storage uploads and AI features are still pending implementation.

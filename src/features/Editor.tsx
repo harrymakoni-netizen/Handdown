@@ -189,10 +189,10 @@ export function Editor({
             />
           </label>
           <label>
-            Demonstration video · MP4, 90 seconds, 8 MiB
+            Demonstration video · MP4/MOV/WebM, 10 minutes, 100 MiB
             <input
               type="file"
-              accept="video/mp4"
+              accept="video/mp4,video/quicktime,video/webm,.mov"
               disabled={busy}
               onChange={(e) => setVideo(e.target.files?.[0] || null)}
             />
@@ -206,7 +206,8 @@ export function Editor({
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
             />
-            Send this selected video to cloud Gemini for drafting
+            Send this selected video to cloud Gemini; files over 12 MiB upload
+            privately for Agent Platform processing
           </label>
           <button
             disabled={busy || !video || !consent || !lesson.title.trim()}
@@ -216,6 +217,7 @@ export function Editor({
                   video!,
                   lesson.title,
                   consent,
+                  setMessage,
                 );
                 edit({ ...next, id: lesson.id });
                 setActive(0);
@@ -228,9 +230,12 @@ export function Editor({
             {busy ? "Working…" : "Generate draft from video"}
           </button>
           <p className="muted">
-            The source video stays in this tab unless you explicitly send it for
-            drafting. It is not retained in shared storage. A failed call is
-            never automatically resent.
+            The source video stays in this tab until you confirm cloud
+            processing. Files over 12 MiB require Agent Platform Gemini API
+            enabled in Firebase AI Logic. Larger files upload privately and are
+            deleted after the request when possible. The cleanup job removes
+            abandoned originals older than 24 hours. Failed requests are never
+            automatically resent.
           </p>
         </section>
         <section className="panel">

@@ -81,3 +81,33 @@ test("review images are owned by session learner and hidden from other learners"
     ),
   );
 });
+test("authoring videos remain private to their uploader and require a supervisor", async () => {
+  const path = "authoring-media/expert/demo.mp4",
+    video = new Uint8Array(9 * 1024 * 1024);
+  await assertSucceeds(
+    uploadBytes(ref(storage("expert"), path), video, {
+      contentType: "video/mp4",
+    }),
+  );
+  await assertSucceeds(getBytes(ref(storage("expert"), path)));
+  await assertFails(getBytes(ref(storage("student"), path)));
+  await assertFails(
+    uploadBytes(
+      ref(storage("student"), "authoring-media/student/demo.mp4"),
+      photo,
+      { contentType: "video/mp4" },
+    ),
+  );
+  await assertFails(
+    uploadBytes(ref(storage("expert"), path), photo, {
+      contentType: "video/mp4",
+    }),
+  );
+  await assertFails(
+    uploadBytes(
+      ref(storage("expert"), "authoring-media/expert/file.txt"),
+      photo,
+      { contentType: "text/plain" },
+    ),
+  );
+});

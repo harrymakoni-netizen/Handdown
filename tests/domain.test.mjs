@@ -152,3 +152,37 @@ test("learner acknowledgement cannot resolve a visual checkpoint", () => {
   assert.equal(resolved({ resolutions: { fit: "SUPERVISOR" } }, step), true);
   assert.equal(resolved({ resolutions: { fit: "LOCAL_CHECK" } }, step), true);
 });
+
+test("video uploads support ten minutes and 100 MiB with a bounded inline route", async () => {
+  const {
+    videoMime,
+    validateVideoDuration,
+    videoTransport,
+    MAX_VIDEO_BYTES,
+    INLINE_VIDEO_BYTES,
+  } = await import("../functions/lib/shared/video.js");
+  assert.equal(
+    videoMime({ name: "demo.mp4", type: "video/mp4", size: MAX_VIDEO_BYTES }),
+    "video/mp4",
+  );
+  assert.equal(
+    videoMime({ name: "ipad.mov", type: "", size: 20 * 1024 * 1024 }),
+    "video/quicktime",
+  );
+  assert.doesNotThrow(() => validateVideoDuration(600));
+  assert.doesNotThrow(() => validateVideoDuration(180));
+  assert.throws(() => validateVideoDuration(601));
+  assert.throws(() => validateVideoDuration(Infinity));
+  assert.throws(() =>
+    videoMime({
+      name: "large.mp4",
+      type: "video/mp4",
+      size: MAX_VIDEO_BYTES + 1,
+    }),
+  );
+  assert.throws(() =>
+    videoMime({ name: "bad.txt", type: "text/plain", size: 100 }),
+  );
+  assert.equal(videoTransport(INLINE_VIDEO_BYTES), "inline");
+  assert.equal(videoTransport(INLINE_VIDEO_BYTES + 1), "storage");
+});

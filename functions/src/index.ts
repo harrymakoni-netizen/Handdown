@@ -588,6 +588,15 @@ export const purgeExpiredReviewMedia = onSchedule(
         expiresAt: FieldValue.delete(),
       });
     }
+    const [videos] = await bucket.getFiles({ prefix: "authoring-media/" });
+    for (const video of videos) {
+      const created = Date.parse(video.metadata.timeCreated || "");
+      if (
+        Number.isFinite(created) &&
+        Date.now() - created > 24 * 60 * 60 * 1000
+      )
+        await video.delete({ ignoreNotFound: true });
+    }
     const [files] = await bucket.getFiles({ prefix: "review-media/" });
     for (const file of files) {
       const created = Date.parse(file.metadata.timeCreated || "");

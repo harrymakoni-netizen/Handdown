@@ -4,6 +4,13 @@ service firebase.storage {
   function member(){return request.auth != null && firestore.exists(/databases/(default)/documents/workspaces/training/members/$(request.auth.uid));}
   function supervisor(){return member() && firestore.get(/databases/(default)/documents/workspaces/training/members/$(request.auth.uid)).data.role in ['owner','supervisor'];}
   function image(){return request.resource.size <= 4 * 1024 * 1024 && request.resource.contentType in ['image/png','image/jpeg'];}
+  match /authoring-media/{uid}/{file} {
+   allow read, delete: if member() && request.auth.uid==uid;
+   allow create: if resource == null && supervisor() && request.auth.uid==uid
+     && request.resource.size > 0 && request.resource.size <= 100 * 1024 * 1024
+     && request.resource.contentType in ['video/mp4','video/quicktime','video/webm'];
+   allow update: if false;
+  }
   match /lesson-media/{uid}/{file} {
    allow read: if member();
    allow create: if resource == null && supervisor() && request.auth.uid==uid && image();

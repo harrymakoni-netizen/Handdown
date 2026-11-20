@@ -31,3 +31,22 @@ Installed project-local Codex skill with `npx impeccable install --providers=cod
 The user selected the workshop catalogue direction, captured in PRODUCT.md, DESIGN.md and .impeccable/design.json. Replaced the marketing hero and small typography with a task-first catalogue, paired reference and step sequence, dark navigation and warm orange actions. Includes keyboard dialog focus containment and Escape handling.
 
 Verification: strict TypeScript and production build pass. Impeccable source scan produced no findings (regex-only, not a rendered accessibility audit). Independent Impeccable finish review returned `recapture`: managed browser initialization and preview relay failed, so desktop/mobile captures and visual approval remain outstanding.
+
+## Firebase Hosting (sprint project)
+
+The registered web app initializes against `fbailogic26vrt-3048`. This only initializes the Firebase SDK; Authentication, Firestore persistence, App Check and AI adapters still need implementation. Existing local workspace behavior is preserved.
+
+The public web config is in `src/firebase/client.ts`. It is not an administrative credential. Replace it and the project selection after the temporary sprint project expires.
+
+Deploy from an environment signed in to the assigned Google account:
+
+```sh
+npm ci
+npx firebase login
+npx firebase projects:list
+npm run deploy:hosting
+```
+
+`firebase.json` builds the app before deployment and serves `dist`, with SPA routing and immutable hashed asset caching. `.firebaserc` and the deployment script explicitly target the sprint project. Do not deploy database or Storage rules until they are implemented and tested.
+
+For Google Cloud Shell, clone `https://github.com/harrymakoni-netizen/Handdown.git`, enter the checkout, then run the commands above. If browser callback login is unavailable, use `npx firebase login --no-localhost` and complete authorization privately in that shell. Do not share authentication codes or tokens in chat.

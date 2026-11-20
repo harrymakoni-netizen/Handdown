@@ -1,3 +1,4 @@
+import './firebase/client';
 import React, {useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ArrowUpRight, ArrowRight, Plus, Search, LayoutGrid, List, BookOpen, ClipboardCheck, Monitor, Settings, ChevronDown, ChevronRight, Check, Clock, MoreHorizontal, Play, X, Upload, Camera, ShieldCheck, Wifi, CircleHelp, PanelLeft, Download, FileText, LogOut, CheckCircle2} from 'lucide-react';

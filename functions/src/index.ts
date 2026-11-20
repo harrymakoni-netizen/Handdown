@@ -568,7 +568,9 @@ export const reuseReview = onCall(options, async (request) => {
 
 // Shared originals expire; approved, consented lesson references remain version assets.
 export const purgeExpiredReviewMedia = onSchedule(
-  { schedule: "every 24 hours", region: "africa-south1", timeoutSeconds: 540 },
+  // Cloud Scheduler is unavailable in Johannesburg; keep this scheduled job
+  // in a supported region while callable Functions stay in africa-south1.
+  { schedule: "every 24 hours", region: "europe-west1", timeoutSeconds: 540 },
   async () => {
     const expired = await root
       .collection("reviews")

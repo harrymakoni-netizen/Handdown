@@ -7,10 +7,14 @@
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit",
     "deploy:hosting": "firebase deploy --only hosting --project fbailogic26vrt-3048",
-    "deploy:firebase": "firebase deploy --only firestore:rules,hosting --project fbailogic26vrt-3048",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-handdown \"node --test tests/firestore.rules.test.mjs\""
+    "deploy:firebase": "npm --prefix functions ci && firebase deploy --only firestore:rules,storage,functions:handdown,hosting --project fbailogic26vrt-3048",
+    "test:rules": "firebase emulators:exec --only firestore,storage --project demo-handdown \"node --test --test-concurrency=1 tests/firestore.rules.test.mjs tests/storage.rules.test.mjs\"",
+    "test": "npm --prefix functions run build && node --test tests/domain.test.mjs",
+    "test:integration": "npm --prefix functions run build && firebase emulators:exec --only firestore,storage --project demo-handdown \"node --test --test-concurrency=1 tests/firestore.rules.test.mjs tests/storage.rules.test.mjs tests/backend.test.mjs\"",
+    "test:e2e": "npm --prefix functions run build && VITE_USE_EMULATORS=true vite build --mode test && firebase emulators:exec --only auth,firestore,storage,functions --project demo-handdown \"node tests/e2e.mjs\""
   },
   "dependencies": {
+    "dexie": "4.4.7",
     "firebase": "13.4.0",
     "lucide-react": "0.468.0",
     "react": "19.1.0",
@@ -21,7 +25,9 @@
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "firebase-tools": "15.37.0",
+    "playwright": "1.65.1",
     "typescript": "5.7.3",
-    "vite": "6.1.0"
+    "vite": "6.1.0",
+    "vite-plugin-pwa": "2.0.0"
   }
 }

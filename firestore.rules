@@ -6,6 +6,7 @@ service cloud.firestore {
     function isMember() {
       return signedIn() && exists(/databases/$(database)/documents/workspaces/training/members/$(request.auth.uid));
     }
+    function isSupervisor() { return isOwner() || (isMember() && get(/databases/$(database)/documents/workspaces/training/members/$(request.auth.uid)).data.role == 'supervisor'); }
     match /workspaces/{wid} {
       // The provisioned owner can read the absent document during bootstrap.
       allow get: if wid == 'training' && (isOwner() || isMember());
@@ -15,6 +16,28 @@ service cloud.firestore {
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.createdAt == request.time;
       allow update, delete, list: if false;
+      match /drafts/{lid} {
+        allow read: if wid == 'training' && isSupervisor();
+        allow write: if false;
+        match /validation/{report} { allow read: if wid == 'training' && isSupervisor(); allow write: if false; }
+      }
+      match /lessons/{lid} {
+        allow read: if wid == 'training' && isMember();
+        allow write: if false;
+        match /versions/{vid} { allow read: if wid == 'training' && isMember(); allow write: if false; }
+      }
+      match /sessions/{sid} {
+        allow read: if wid == 'training' && isMember() && (isSupervisor() || resource.data.uid == request.auth.uid);
+        allow write: if false;
+        match /events/{event} {
+          allow read: if wid == 'training' && isMember() && (isSupervisor() || get(/databases/$(database)/documents/workspaces/training/sessions/$(sid)).data.uid == request.auth.uid);
+          allow write: if false;
+        }
+      }
+      match /reviews/{rid} {
+        allow read: if wid == 'training' && isMember() && (isSupervisor() || resource.data.uid == request.auth.uid);
+        allow write: if false;
+      }
       match /members/{uid} {
         allow get: if wid == 'training' && signedIn() && (request.auth.uid == uid || isOwner());
         allow list: if wid == 'training' && isOwner();
@@ -28,7 +51,7 @@ service cloud.firestore {
         allow delete: if wid == 'training' && isOwner() && uid != request.auth.uid;
       }
     }
-    // Shared lessons, cases and audit events are intentionally not writable yet.
+    // All business writes go through App Check protected, role-checked callable functions.
     match /{document=**} { allow read, write: if false; }
   }
 }

@@ -1,11 +1,7 @@
 {
   "hosting": {
     "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -32,9 +28,7 @@
         ]
       }
     ],
-    "predeploy": [
-      "npm run build"
-    ]
+    "predeploy": ["npm run build"]
   },
   "firestore": {
     "rules": "firestore.rules"
@@ -46,6 +40,27 @@
     "ui": {
       "enabled": false
     },
-    "singleProjectMode": true
+    "singleProjectMode": true,
+    "storage": {
+      "port": 9199
+    },
+    "functions": {
+      "port": 5001
+    },
+    "auth": {
+      "port": 9099
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "handdown",
+      "runtime": "nodejs22",
+      "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"],
+      "ignore": ["node_modules", ".git", "*-debug.log", "tests"]
+    }
+  ],
+  "storage": {
+    "rules": "storage.rules"
   }
 }

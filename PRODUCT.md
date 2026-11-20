@@ -9,7 +9,7 @@ Turn an expert demonstration into a reviewed, reusable lesson and support guided
 ## Operating Context
 One harmless tabletop display stand, one workspace, three intended visual checkpoints, desktop Chrome. The user confirmed that the lesson workspace should define this redesign.
 ## Capabilities and Constraints
-Current preview: local drafts, practice acknowledgements, photo uploads, review annotations and session records. Firebase, local model inference, actual approval permissions and offline packaging are not yet configured. Never present simulated AI passes or local review annotations as authenticated decisions.
+Firebase sign-in and App Check were confirmed on the live origin by the user. Implemented code includes shared drafts, consented cloud video drafting, immutable versions, a local-only Firebase AI Logic adapter, evidence-gated visual publication, verified IndexedDB packages, offline reload and ordered sync, explicit photo sharing, attributed supervisor decisions, consented revisions and review-media retention. Emulator and browser fixtures verify software behavior, not AI accuracy. The new backend must be deployed and exercised on the supplied project; actual cloud authoring, local-model recognition, Gate A/B results and novice usability remain live release gates. Never present simulated AI passes or client-reported observations as independent proof of physical work. The provided sprint project expires according to its account instructions.
 ## Brand Commitments
 Name: Handdown. Development specification: light neutral background, readable dark text, restrained status colors. Workstation precision and simple recovery. User requested a fresh UI using Impeccable.
 ## Evidence on Hand

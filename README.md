@@ -1,76 +1,78 @@
 # Handdown
 
-A React + TypeScript workstation preview built from the supplied development specification.
+Handdown turns an expert's short demonstration into a supervisor-approved lesson. A learner follows a specific version, checks selected visible conditions locally and explicitly asks a supervisor for help when needed.
 
-## Run
-
-Node 22+, `npm ci`, `npm run dev`. Build with `npm run build` (includes strict TypeScript checks).
+Built with React, TypeScript, Vite, Firebase Authentication, Firestore, Storage, callable Functions, App Check and Firebase AI Logic. Hosted on Firebase. The current sprint project is temporary; see the account provider's expiry instructions.
 
 ## Implemented
 
-Responsive lesson library, search and status filters, grid/list view, manual draft creation and editing, five-step reference lesson, photo upload, local practice progress, local review cases with separate reuse permission, local review annotations with required reasons, camera permission test and track cleanup, browser model availability probe, workspace JSON export.
+- Email/password sign-in, password reset and owner-managed workspace membership.
+- Shared draft editing, video-to-draft through cloud Gemini with explicit consent, video-frame or uploaded references.
+- Immutable approved versions, content/manifest hashes and reference digests; real-device evaluation gates for visual checkpoints.
+- Guided practice with ordered steps, camera/photo capture, local-only Firebase AI Logic checks, explicit uncertainty and error recovery.
+- Verified lesson downloads, PWA shell, account-scoped IndexedDB, offline reload and an ordered idempotent outbox.
+- Explicit photograph/note sharing, independent example-reuse permission, attributed supervisor decisions and consented candidate revisions.
+- Separate learner acknowledgements, client-reported local observations and supervisor decisions in completion records.
+- Firestore/Storage isolation, trusted business mutations through role-checked/App Check protected callable Functions, withdrawal handling and shared-photo retention.
 
-## Current boundaries
+## What has and has not been verified
 
-This is a prototype, not the specification's completed P0 release. Data persists in localStorage in this browser only. Photos remain local. No authenticated permissions, backend, Firebase project, cloud video authoring, Firebase AI Logic inference, service-worker offline shell, immutable publication, real image evaluation or model accuracy claims are implemented. The seeded lesson uses a reference illustration, not a tested physical assembly reference. The profile perspective is cosmetic and does not grant permissions. Manual acknowledgements never become AI passes. Review annotations are not authenticated supervisor decisions. Large media can exceed browser storage limits.
+Synthetic tests exercise software behavior; they are not measurements of the visual model. The browser test uses an instruction-only fixture and explicit synthetic photographs. It never simulates an AI pass.
 
-## Next release gates
+The supplied-account live sign-in and App Check were verified by the user before this release. The complete new backend/client must still be deployed and exercised on that project. Cloud Gemini video drafting and the local image model require live provider and device testing. Gate A/B performance, physical correctness, novice usability and production latency have not been measured by this repository's automated tests. Visual publication stays blocked until the real evaluation report meets the gate. See [release instructions](docs/RELEASE.md).
 
-1. Configure development Firebase, App Check and seeded roles; validate real-device local image inference through Firebase AI Logic.
-2. Freeze checkpoint conditions and measure Gate A before enabling any visual pass output.
-3. Implement cloud authoring with explicit consent and schemas; add approved immutable versions.
-4. Replace local preview storage with Dexie, asset integrity validation and a service worker; build the authenticated review backend and outbox.
-5. Run Gate B, rules tests, full offline reload and complete end-to-end scenario on the target workstation.
+## Development
 
-Build/typecheck passed. Browser QA could not run because the managed browser sandbox failed to initialize.
-
-## UI redesign and Impeccable
-
-Installed project-local Codex skill with `npx impeccable install --providers=codex --scope=project`. Skill lives in `.agents/skills/impeccable/`; hook configuration is in `.codex/hooks.json`. Codex may require a reload and hook approval to activate automatic checks in future sessions; this session read the skill and ran its detector directly.
-
-The user selected the workshop catalogue direction, captured in PRODUCT.md, DESIGN.md and .impeccable/design.json. Replaced the marketing hero and small typography with a task-first catalogue, paired reference and step sequence, dark navigation and warm orange actions. Includes keyboard dialog focus containment and Escape handling.
-
-Verification: strict TypeScript and production build pass. Impeccable source scan produced no findings (regex-only, not a rendered accessibility audit). Independent Impeccable finish review returned `recapture`: managed browser initialization and preview relay failed, so desktop/mobile captures and visual approval remain outstanding.
-
-## Firebase Hosting (sprint project)
-
-The registered web app initializes against `fbailogic26vrt-3048`. This only initializes the Firebase SDK; Authentication, Firestore persistence, App Check and AI adapters still need implementation. Existing local workspace behavior is preserved.
-
-The public web config is in `src/firebase/client.ts`. It is not an administrative credential. Replace it and the project selection after the temporary sprint project expires.
-
-Deploy from an environment signed in to the assigned Google account:
+Use Node 24.12+ for the client SDK/tooling and Java 21 for emulators. Deployed Functions use Node 22, supported by their pinned server dependencies.
 
 ```sh
 npm ci
-npx firebase login
-npx firebase projects:list
-npm run deploy:hosting
+npm --prefix functions ci
+npm run dev
 ```
 
-`firebase.json` builds the app before deployment and serves `dist`, with SPA routing and immutable hashed asset caching. `.firebaserc` and the deployment script explicitly target the sprint project. Do not deploy database or Storage rules until they are implemented and tested.
+The production web configuration is in `src/firebase/client.ts`; the public App Check site key is registered for the primary Firebase Hosting domain. Local real-service development requires a separately registered App Check debug provider; no debug credentials are in the repository. For isolated emulator development, use the test commands below. Emulator connections and App Check bypass are enabled only in explicit development/test builds and Functions emulator processes, never the standard production build.
 
-For Google Cloud Shell, clone `https://github.com/harrymakoni-netizen/Handdown.git`, enter the checkout, then run the commands above. If browser callback login is unavailable, use `npx firebase login --no-localhost` and complete authorization privately in that shell. Do not share authentication codes or tokens in chat.
-
-### App Check
-
-App Check now initializes before Firebase service clients using `ReCaptchaEnterpriseProvider` and the public Handdown Web site key, with automatic token refresh enabled. The key must remain registered against the same Firebase web app. Its authorized domain is `fbailogic26vrt-3048.web.app`; other hosting origins require explicit domain registration before they can obtain valid attestation.
-
-Console registration and a successful build do not prove token attestation works. After deploying, verify real requests and App Check metrics before enabling additional service enforcement. Local development requires a separately registered debug provider; no debug tokens or automatic debug bypass are included. Authentication, Firestore persistence, Storage uploads and AI features are still pending implementation.
-
-## Sign-in and workspace membership
-
-Email/password sign-in, password reset and sign-out now use Firebase Authentication. Only the provisioned owner UID can bootstrap the `training` workspace. Firestore membership documents determine account roles; changing browser state does not grant membership write permissions. The owner can add existing Authentication UIDs through the account profile. There is no public signup or client-selected privilege.
-
-Deploy the membership rules **with** the UI update, from the assigned account's Cloud Shell:
+## Checks
 
 ```sh
+npm run build
+npm test
+npm run test:integration
+npm run test:e2e
+```
+
+`npm test` covers deterministic visual policy, schema rejection, publication evidence gates and hash contracts. Integration tests use `demo-handdown` emulators for roles, data isolation, immutable image writes, callable business operations, idempotent events, withdrawal, review decisions and retention. Browser tests exercise owner sign-in → shared draft → publication → download → session completion, offline reload/reconnection, learner access, photo sharing, supervisor decisions and consented revision.
+
+The browser test uses Playwright and defaults to `/usr/bin/chromium` in the managed environment. Install Playwright Chromium on another development machine or set `CHROMIUM_PATH` to a suitable browser. The test build is isolated from the real Firebase project; run a normal production build again before packaging. Deployment always rebuilds normally.
+
+Some environments route all HTTP through a proxy that ignores `NO_PROXY`. If the Firebase Storage emulator cannot reach the local Firestore emulator, run the emulator tests with proxy variables removed **for that test subprocess only**. This is not a change to deployed security rules.
+
+## Deployment
+
+From the Google Cloud Shell already authenticated to the assigned account:
+
+```sh
+cd ~/Handdown
 git pull --ff-only
-npm ci
-npm run deploy:firebase
+bash scripts/deploy-firebase.sh
 ```
 
-The owner signs in with the account for the UID supplied during setup. The first successful login creates the workspace and its owner membership via a transaction governed by Firestore rules. A non-member sees an access-request screen with their UID, not the workspace. Access errors retain retry, sign-out and App Check diagnostic actions. Live attestation can be tested using Device readiness → Verify App Check; tokens are never displayed or logged.
+This deploys the scoped Handdown Functions codebase, Firestore rules, Storage rules and Hosting, then applies reference-download CORS. Keep the default project `fbailogic26vrt-3048` only while using the supplied sprint account. No service-account JSON, user passwords or CLI authentication tokens belong in GitHub.
 
-Roles protect workspace membership in Firestore. Shared lesson publication, review decisions, uploads and synchronisation remain unimplemented and denied by rules. Local drafts, session progress and review annotations remain in browser storage, now namespaced by signed-in UID. This separates app views on a shared browser but is not encryption; someone with browser storage access can read those records. Previous unscoped preview records are retained in browser storage but are not automatically imported into another identity.
+Only a named trusted owner UID may bootstrap workspace membership. For a different Firebase project, change that UID in both `src/firebase/workspace.ts` and `firestore.rules`, replace the web/App Check configuration, `.firebaserc`, deploy script targets and Storage CORS origins, and redeploy. Create supervisor/learner Authentication accounts privately in the console, then add their UIDs through the signed-in owner's account panel.
 
-Run `npm run test:rules` for the isolated Firestore emulator authorization suite; it uses a `demo-` project and never writes to the sprint database. User passwords and authentication tokens must never be placed in this repository.
+## Source layout
+
+- `shared/domain.ts`: lesson contracts, observation parsing, deterministic outcomes, evaluation gate and canonical hash serialization.
+- `src/ai/`: strictly separated cloud authoring and local-only verification adapters.
+- `src/offline/`: verified packages, account sessions and ordered outbox.
+- `src/features/`: authoring, validation, practice, capture, review and app update interfaces.
+- `functions/src/`: trusted versioning, sessions, review, consented revisions and retention.
+- `tests/`: policy, permissions, backend and browser checks.
+
+[Release and privacy details](docs/RELEASE.md) explain the complete workflow and the live gates remaining before a visual-check release.
+
+## Licenses
+
+Handdown application code is MIT licensed. The bundled IBM Plex Sans fonts retain their SIL Open Font License in `public/fonts/OFL.txt`. The installed Impeccable skill materials retain Apache-2.0 licensing; see `third-party/impeccable-LICENSE.txt`. These third-party materials are excluded from the application's MIT grant.

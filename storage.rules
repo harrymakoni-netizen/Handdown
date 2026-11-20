@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+ match /b/{bucket}/o {
+  function member(){return request.auth != null && firestore.exists(/databases/(default)/documents/workspaces/training/members/$(request.auth.uid));}
+  function supervisor(){return member() && firestore.get(/databases/(default)/documents/workspaces/training/members/$(request.auth.uid)).data.role in ['owner','supervisor'];}
+  function image(){return request.resource.size <= 4 * 1024 * 1024 && request.resource.contentType in ['image/png','image/jpeg'];}
+  match /lesson-media/{uid}/{file} {
+   allow read: if member();
+   allow create: if resource == null && supervisor() && request.auth.uid==uid && image();
+   allow update, delete: if false;
+  }
+  match /review-media/{uid}/{sid}/{step}/{file} {
+   allow read: if member() && (request.auth.uid==uid || supervisor());
+   allow create: if resource == null && member() && request.auth.uid==uid && image()
+     && firestore.get(/databases/(default)/documents/workspaces/training/sessions/$(sid)).data.uid == uid;
+   allow update, delete: if false;
+  }
+  match /{all=**}{allow read, write: if false;}
+ }
+}

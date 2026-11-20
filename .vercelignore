@@ -1,0 +1,7 @@
+.git/
+.agents/
+.codex/
+.impeccable/
+.openai/
+node_modules/
+dist/

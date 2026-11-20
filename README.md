@@ -7,7 +7,7 @@ Built with React, TypeScript, Vite, Firebase Authentication, Firestore, Storage,
 ## Implemented
 
 - Email/password sign-in, password reset and owner-managed workspace membership.
-- Shared draft editing, video-to-draft through cloud Gemini with explicit consent, video-frame or uploaded references. Demonstrations support MP4/MOV/WebM up to 100 MiB and 10 minutes; files over 12 MiB use private Storage and require Agent Platform Gemini API enabled in Firebase AI Logic.
+- Shared draft editing, video-to-draft through cloud Gemini with explicit consent, video-frame or uploaded references. Demonstrations support MP4/MOV/WebM up to 12 MiB and 10 minutes, sent directly to cloud Gemini after consent. Larger files must be compressed first.
 - Immutable approved versions, content/manifest hashes and reference digests; real-device evaluation gates for visual checkpoints.
 - Guided practice with ordered steps, camera/photo capture, local-only Firebase AI Logic checks, explicit uncertainty and error recovery.
 - Verified lesson downloads, PWA shell, account-scoped IndexedDB, offline reload and an ordered idempotent outbox.

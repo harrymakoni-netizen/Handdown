@@ -43,34 +43,3 @@ export async function uploadImage(path: string, blob: Blob) {
 export async function fetchImage(path: string) {
   return getBlob(ref(storage, path), 4 * 1024 * 1024);
 }
-
-export async function uploadAuthoringVideo(
-  file: File,
-  mime: string,
-  progress: (value: number) => void,
-) {
-  const { uploadBytesResumable } = await import("firebase/storage");
-  const { auth } = await import("./workspace");
-  if (!auth.currentUser)
-    throw new Error("Sign in before uploading a demonstration.");
-  const extension =
-    mime === "video/quicktime" ? "mov" : mime === "video/webm" ? "webm" : "mp4";
-  const object = ref(
-    storage,
-    `authoring-media/${auth.currentUser.uid}/${crypto.randomUUID()}.${extension}`,
-  );
-  const task = uploadBytesResumable(object, file, { contentType: mime });
-  await new Promise<void>((resolve, reject) =>
-    task.on(
-      "state_changed",
-      (s) => progress(s.bytesTransferred / s.totalBytes),
-      reject,
-      () => resolve(),
-    ),
-  );
-  return { path: object.fullPath, uri: object.toString() };
-}
-export async function deleteAuthoringVideo(path: string) {
-  const { deleteObject } = await import("firebase/storage");
-  await deleteObject(ref(storage, path));
-}

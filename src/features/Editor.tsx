@@ -15,6 +15,7 @@ import {
   type EvaluationCase,
   type ValidationReport,
 } from "../../shared/domain";
+import { videoMime } from "../../shared/video";
 import { Reference } from "./Reference";
 const blankStep = (): Step => ({
   id: crypto.randomUUID(),
@@ -189,12 +190,23 @@ export function Editor({
             />
           </label>
           <label>
-            Demonstration video · MP4/MOV/WebM, 10 minutes, 100 MiB
+            Demonstration video · MP4/MOV/WebM, 10 minutes, 12 MiB
             <input
               type="file"
               accept="video/mp4,video/quicktime,video/webm,.mov"
               disabled={busy}
-              onChange={(e) => setVideo(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                try {
+                  if (file) videoMime(file);
+                  setVideo(file);
+                  setMessage("");
+                } catch (error) {
+                  setVideo(null);
+                  e.target.value = "";
+                  setMessage(problem(error));
+                }
+              }}
             />
           </label>
           {videoUrl && (
@@ -206,8 +218,7 @@ export function Editor({
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
             />
-            Send this selected video to cloud Gemini; files over 12 MiB upload
-            privately for Agent Platform processing
+            Send this selected video to cloud Gemini
           </label>
           <button
             disabled={busy || !video || !consent || !lesson.title.trim()}
@@ -230,12 +241,9 @@ export function Editor({
             {busy ? "Working…" : "Generate draft from video"}
           </button>
           <p className="muted">
-            The source video stays in this tab until you confirm cloud
-            processing. Files over 12 MiB require Agent Platform Gemini API
-            enabled in Firebase AI Logic. Larger files upload privately and are
-            deleted after the request when possible. The cleanup job removes
-            abandoned originals older than 24 hours. Failed requests are never
-            automatically resent.
+            Choose a video up to 12 MiB and 10 minutes. It stays in this tab
+            until you confirm cloud processing. Compress larger videos before
+            selecting them. Failed requests are never automatically resent.
           </p>
         </section>
         <section className="panel">
